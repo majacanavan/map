@@ -8,6 +8,16 @@
   <script src="https://unpkg.com/leaflet-pip@1.1.0/leaflet-pip.min.js"></script>
 
   <style>
+@font-face {
+   font-family: myFirstFont;
+   src: url(https://majacanavan.github.io/map/assets/big-caslon-medium.woff);
+}
+
+@font-face {
+   font-family: mySecondFont;
+   src: url(https://majacanavan.github.io/map/assets/eb-garamond-regular.woff);
+}
+    
     html, body, #map {
       height: 100%;
       margin: 0;
@@ -19,6 +29,7 @@
       padding: 2px 6px;
       font-size: 15px;
       color: #000;
+      font-family: myFirstFont;
     }
 
     /* Main container for the panels */
@@ -40,6 +51,7 @@
         border-radius: 5px;
         width: 160px;
         right: 10px;
+        font-family: myFirstFont;
     }
 
     .coord-panel2 {
@@ -47,6 +59,7 @@
         padding: 10px 15px;
         border-radius: 5px;
         width: 250px;
+        font-family: myFirstFont;
     }
 
     .coord-panel1 h3, .coord-panel2 h3 {
@@ -86,6 +99,13 @@
     /* Specific widths for DMS inputs */
     #dmsLatD, #dmsLatM, #dmsLatS, #dmsLonD, #dmsLonM, #dmsLonS {
         width: 30px;
+        font-family: mySecondFont;
+        text-align: center;
+    }
+    
+    #ddLon, #ddLat {
+    	font-family: mySecondFont;
+        text-align: center;
     }
 
     #dmsLatDir {
@@ -94,6 +114,7 @@
         border-radius: 4px;
         cursor: pointer;
         width: 50px;
+        font-family: myFirstFont;
     }
 
     #dmsLonDir {
@@ -101,7 +122,8 @@
         border: 1px solid #ccc;
         border-radius: 4px;
         cursor: pointer;
-        width: 48px;
+        width: 50px;
+        font-family: myFirstFont;
     }
 
     .coord-panel1 button, .coord-panel2 button {
@@ -113,6 +135,8 @@
         border-radius: 4px;
         cursor: pointer;
         margin-top: 5px;
+        font-family: myFirstFont;
+        font-size: 14px;
     }
 
     .coord-panel1 button:hover, .coord-panel2 button:hover {
@@ -184,12 +208,12 @@
     { name: 'Australia', url: 'https://majacanavan.github.io/map/js/australia.geojson' },
     { name: 'Eswatini', url: 'https://majacanavan.github.io/map/js/eswatini.geojson' },
     { name: 'Lesotho', url: 'https://majacanavan.github.io/map/js/lesotho.geojson' },
-    { name: 'Antananarivo', url: 'https://majacanavan.github.io/map/js/mad-antana.geojson' },
-    { name: 'Antsiranana', url: 'https://majacanavan.github.io/map/js/mad-antsir.geojson' },
-    { name: 'Fianarantsoa', url: 'https://majacanavan.github.io/map/js/mad-fianar.geojson' },
-    { name: 'Mahajanga', url: 'https://majacanavan.github.io/map/js/mad-mahaja.geojson' },
-    { name: 'Toamasina', url: 'https://majacanavan.github.io/map/js/mad-toamas.geojson' },
-    { name: 'Toliary', url: 'https://majacanavan.github.io/map/js/mad-toliar.geojson' },
+    { name: 'Antananarivo, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-antana.geojson' },
+    { name: 'Antsiranana, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-antsir.geojson' },
+    { name: 'Fianarantsoa, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-fianar.geojson' },
+    { name: 'Mahajanga, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-mahaja.geojson' },
+    { name: 'Toamasina, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-toamas.geojson' },
+    { name: 'Toliary, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-toliar.geojson' },
     { name: 'Namibia', url: 'https://majacanavan.github.io/map/js/namibia.geojson' },
     { name: 'New Caledonia', url: 'https://majacanavan.github.io/map/js/nc.geojson' },
     { name: 'New Zealand', url: 'https://majacanavan.github.io/map/js/nz.geojson' },

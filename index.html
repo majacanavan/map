@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-pip@1.1.0/leaflet-pip.min.js"></script>
+
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .custom-tooltip {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 2px 6px;
+      font-size: 15px;
+      color: #000;
+    }
+
+/* Main container for the panels */
+#search-panels {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+/* Shared style for each panel */
+.coord-panel1 {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    width: 160px;
+    right: 10px;
+}
+
+.coord-panel2 {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    width: 250px;
+}
+
+.coord-panel1 h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.coord-panel2 h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* Flexbox row for alignment */
+.coord-panel1 .input-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.coord-panel2 .input-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.coord-panel1 label {
+    font-weight: bold;
+    min-width: 40px;
+}
+
+.coord-panel2 label {
+    font-weight: bold;
+    min-width: 40px;
+}
+
+.coord-panel1 input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100px;
+}
+
+.coord-panel2 input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Specific widths for DMS inputs */
+#dms-panel input {
+
+}
+
+#dmsLatD {
+	width: 30px;
+}
+
+#dmsLatM {
+	width: 30px;
+}
+
+#dmsLatS {
+	width: 30px;
+}
+
+#dmsLonD {
+	width: 30px;
+}
+
+#dmsLonM {
+	width: 30px;
+}
+
+#dmsLonS {
+	width: 30px;
+}
+
+#dmsLatDir {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 50px;
+}
+
+#dmsLonDir {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 48px;
+}
+
+.coord-panel1 button {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.coord-panel2 button {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.coord-panel1 button:hover {
+    background-color: #0056b3;
+}
+
+.coord-panel2 button:hover {
+    background-color: #0056b3;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+  </style>
+</head>
+<body>
+
+<div id="search-panels">
+
+    <div id="dms-panel" class="coord-panel2">
+        <h3>Degrees, Minutes, Seconds</h3>
+        <div class="input-row">
+            <label>Lat:</label>
+            <select id="dmsLatDir">
+                <option value="N" selected>N</option>
+                <option value="S">S</option>
+            </select>            
+            <input type="number" id="dmsLatD" placeholder="D">
+            <input type="number" id="dmsLatM" placeholder="M">
+            <input type="number" id="dmsLatS" placeholder="S">
+        </div>
+        <div class="input-row">
+            <label>Long:</label>
+            <select id="dmsLonDir">
+                <option value="E" selected>E</option>
+                <option value="W">W</option>
+            </select>            
+            <input type="number" id="dmsLonD" placeholder="D">
+            <input type="number" id="dmsLonM" placeholder="M">
+            <input type="number" id="dmsLonS" placeholder="S">
+        </div>
+        <button onclick="searchByDMS()">Search</button>
+    </div>
+    
+    <div id="dd-panel" class="coord-panel1">
+        <h3>Decimal Degrees</h3>
+        <div class="input-row">
+            <label for="ddLat">Lat:</label>
+            <input type="number" id="ddLat" placeholder="-25.576" step="any">
+        </div>
+        <div class="input-row">
+            <label for="ddLon">Long:</label>
+            <input type="number" id="ddLon" placeholder="133.491" step="any">
+        </div>
+        <button onclick="searchByDD()">Search</button>
+    </div>    
+
+</div>
+
+<div id="map"></div>
+
+<script>
+  // Initialize map
+  const map = L.map('map').setView([-25, 145], 4); // Centered more broadly
+
+  // Add base tile layer
+  const osmTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // --- 1. DEFINE ALL YOUR GEOJSON SOURCES HERE ---
+  // Add as many as you like. Give each a unique 'name'.
+  const geojsonSources = [
+    {
+      name: 'Australia',
+      url: 'https://majacanavan.github.io/map/js/australia.geojson'
+    },
+    {
+      name: 'Eswatini',
+      url: 'https://majacanavan.github.io/map/js/eswatini.geojson'
+    },
+    {
+      name: 'Lesotho',
+      url: 'https://majacanavan.github.io/map/js/lesotho.geojson'
+    },
+    {
+      name: 'Antananarivo',
+      url: 'https://majacanavan.github.io/map/js/mad-ant.geojson'
+    },
+    {
+      name: 'Antsiranana',
+      url: 'https://majacanavan.github.io/map/js/mad-ant.geojson'
+    },
+    {
+      name: 'Fianarantsoa',
+      url: 'https://majacanavan.github.io/map/js/mad-fianar.geojson'
+    },
+    {
+      name: 'Mahajanga',
+      url: 'https://majacanavan.github.io/map/js/mad-mahaja.geojson'
+    },
+    {
+      name: 'Toamasina',
+      url: 'https://majacanavan.github.io/map/js/mad-toamas.geojson'
+    },
+    {
+      name: 'Toliary',
+      url: 'https://majacanavan.github.io/map/js/mad-toliar.geojson'
+    },
+    {
+      name: 'Namibia',
+      url: 'https://majacanavan.github.io/map/js/namibia.geojson'
+    },
+    {
+      name: 'New Caledonia',
+      url: 'https://majacanavan.github.io/map/js/nc.geojson'
+    },
+    {
+      name: 'New Zealand',
+      url: 'https://majacanavan.github.io/map/js/nz.geojson'
+    },
+    {
+      name: 'Papua New Guinea',
+      url: 'https://majacanavan.github.io/map/js/papua.geojson'
+    },
+    {
+      name: 'South Africa',
+      url: 'https://majacanavan.github.io/map/js/safr.geojson'
+    }
+  ];
+
+  // --- 2. SETUP CONTAINERS FOR LAYERS ---
+  // For the layer control (allows toggling layers by name)
+  const overlayMaps = {}; 
+  // For searching across all layers at once
+  const allGeoJsonLayers = L.layerGroup().addTo(map); 
+
+  // --- 3. LOAD ALL GEOJSONS DYNAMICALLY ---
+  const promises = geojsonSources.map(source => {
+    return fetch(source.url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Network response was not ok for ${source.name}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Create the GeoJSON layer with styling and interactions
+        const geoJsonLayer = L.geoJson(data, {
+          style: style,
+          onEachFeature: onEachFeature
+        });
+
+        // Add to our group for unified searching
+        allGeoJsonLayers.addLayer(geoJsonLayer);
+
+        // Add the named layer to our overlays object for the control
+        overlayMaps[source.name] = geoJsonLayer;
+      })
+      .catch(error => console.error('Error loading GeoJSON:', source.name, error));
+  });
+
+  // --- 4. ADD THE LAYER CONTROL AFTER ALL LAYERS ARE LOADED ---
+  Promise.all(promises).then(() => {
+    const baseMaps = {
+        "OpenStreetMap": osmTileLayer
+    };
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+    console.log("All GeoJSON layers loaded and control added.");
+  });
+
+  // Style for all polygons
+  function style(feature) {
+    return {
+      fillColor: '#2f8a35',
+      weight: 1.5,
+      opacity: 1,
+      color: 'white',
+      fillOpacity: 0.7
+    };
+  }
+
+  // Hover highlight
+  function highlightFeature(e) {
+    const layer = e.target;
+    layer.setStyle({
+      weight: 3,
+      fillColor: '#72a2ad',
+      color: '#7f8384',
+      dashArray: '',
+      fillOpacity: 0.9
+    });
+    layer.bringToFront();
+  }
+
+  // Reset style on mouseout - Corrected to reset only the specific layer
+  function resetHighlight(e) {
+    // 'e.target' is the layer that the mouse left.
+    // The L.geoJson object knows its own styles, so we can just call resetStyle on it.
+    const layer = e.target;
+    // Find the parent GeoJSON layer group this feature belongs to and reset its style
+    allGeoJsonLayers.eachLayer(geoJsonLayerGroup => {
+      if (geoJsonLayerGroup.hasLayer(layer)) {
+        geoJsonLayerGroup.resetStyle(layer);
+      }
+    });
+  }
+
+  function onEachFeature(feature, layer) {
+    // Use a generic property if 'name' isn't available
+    const displayName = feature.properties.name || feature.properties.NAME || 'N/A';
+    
+    layer.bindTooltip(displayName, {
+      permanent: false,
+      direction: 'top',
+      className: 'custom-tooltip',
+      sticky: true
+    });
+
+    layer.on({
+      mouseover: highlightFeature,
+      mouseout: resetHighlight
+    });
+  }
+</script>
+
+<script>
+    let activeMarker = null; // store the most recent marker
+
+    /**
+     * This is a shared helper function. It takes final coordinates,
+     * places the marker, and searches for the underlying feature.
+     * @param {number} lat The final latitude.
+     * @param {number} lng The final longitude.
+     */
+    function placeMarkerAndSearch(lat, lng) {
+        map.setView([lat, lng], 10);
+
+        let foundName = null;
+        try {
+            const matches = leafletPip.pointInLayer([lng, lat], allGeoJsonLayers, true);
+            if (matches.length > 0) {
+                const props = matches[0].feature.properties;
+                foundName = props.name || props.NAME || 'Unnamed Area';
+            }
+        } catch (err) {
+            console.error("Error in leafletPip:", err);
+        }
+
+        const popupText = foundName ? `Location: ${foundName}` : `No named area found at this location.`;
+
+        if (activeMarker) {
+            map.removeLayer(activeMarker);
+        }
+
+        activeMarker = L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(popupText)
+            .openPopup();
+    }
+    
+    /**
+     * Handles search from the Decimal Degrees panel.
+     */
+    function searchByDD() {
+        const lat = parseFloat(document.getElementById('ddLat').value);
+        const lng = parseFloat(document.getElementById('ddLon').value);
+
+        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            alert('Invalid Decimal Degrees. Please check your input.');
+            return;
+        }
+
+        placeMarkerAndSearch(lat, lng);
+    }
+
+    /**
+     * Handles search from the Degrees, Minutes, Seconds panel.
+     */
+    function searchByDMS() {
+        // --- Latitude ---
+        const latD = parseFloat(document.getElementById('dmsLatD').value) || 0;
+        const latM = parseFloat(document.getElementById('dmsLatM').value) || 0;
+        const latS = parseFloat(document.getElementById('dmsLatS').value) || 0;
+        const latDir = document.getElementById('dmsLatDir').value;
+        let lat = latD + (latM / 60) + (latS / 3600);
+        if (latDir === 'S') {
+            lat *= -1;
+        }
+
+        // --- Longitude ---
+        const lonD = parseFloat(document.getElementById('dmsLonD').value) || 0;
+        const lonM = parseFloat(document.getElementById('dmsLonM').value) || 0;
+        const lonS = parseFloat(document.getElementById('dmsLonS').value) || 0;
+        const lonDir = document.getElementById('dmsLonDir').value;
+        let lng = lonD + (lonM / 60) + (lonS / 3600);
+        if (lonDir === 'W') {
+            lng *= -1;
+        }
+        
+        // --- Validation ---
+        if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            alert('Invalid DMS values. Please check your input.');
+            return;
+        }
+
+        placeMarkerAndSearch(lat, lng);
+    }
+</script>
+
+</body>
+</html>

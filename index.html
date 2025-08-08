@@ -309,7 +309,7 @@
         });
         // --- END OF FIX ---
 
-        const popupText = foundName ? `Location: ${foundName}` : `No named area found at this location.`;
+        const popupText = foundName ? `${foundName}` : `No named area found at this location.`;
 
         if (activeMarker) {
             map.removeLayer(activeMarker);

@@ -282,23 +282,17 @@
      * @param {number} lng The final longitude.
      */
     function placeMarkerAndSearch(lat, lng) {
-        map.setView([lat, lng], 10);
+        // --- THIS IS THE CHANGE ---
+        // Use flyTo for a smooth, animated transition to the new point.
+        map.flyTo([lat, lng], 10);
 
         let foundName = null;
 
-        // --- FIX IS HERE ---
-        // We must iterate over each GeoJSON layer in our group and check them one by one.
         allGeoJsonLayers.eachLayer(function (geoJsonLayer) {
-            // If we already found a name in a previous layer, stop searching.
-            if (foundName) {
-                return;
-            }
-
+            if (foundName) { return; }
             try {
-                // Run leafletPip on the individual L.geoJson layer
                 const matches = leafletPip.pointInLayer([lng, lat], geoJsonLayer, true);
                 if (matches.length > 0) {
-                    // Success! We found a match.
                     const props = matches[0].feature.properties;
                     foundName = props.name || props.NAME || 'Unnamed Area';
                 }
@@ -306,7 +300,6 @@
                 console.error("Error checking a layer with leafletPip:", err);
             }
         });
-        // --- END OF FIX ---
 
         const popupText = foundName ? `${foundName}` : `No named area found at this location.`;
 

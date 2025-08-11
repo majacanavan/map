@@ -209,6 +209,7 @@
     { name: 'Canada', url: 'https://majacanavan.github.io/map/js/canada.geojson' },
     { name: 'Eswatini', url: 'https://majacanavan.github.io/map/js/eswatini.geojson' },
     { name: 'Fiji', url: 'https://majacanavan.github.io/map/js/fiji.geojson' },
+    { name: 'Hawaiian Islands', url: 'https://majacanavan.github.io/map/js/hawaiian_isl.geojson' },
     { name: 'Lesotho', url: 'https://majacanavan.github.io/map/js/lesotho.geojson' },
     { name: 'Antananarivo, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-antana.geojson' },
     { name: 'Antsiranana, Madagascar', url: 'https://majacanavan.github.io/map/js/mad-antsir.geojson' },
@@ -230,6 +231,36 @@
     { name: 'Torba, Vanuatu', url: 'https://majacanavan.github.io/map/js/van-torba.geojson' }    
   ];
 
+  // *** MODIFICATION 1: The Color Map ***
+  // The keys here MUST exactly match the 'name' from geojsonSources above.
+  const colorMap = {
+    'Australia': '#FFC300',
+    'Canada': '#C70039',
+    'Eswatini': '#900C3F',
+    'Fiji': '#581845',
+    'United States': '#1E8449',
+    'New Zealand': '#2E4053',
+    'South Africa': '#D35400',
+    'Namibia': '#F39C12',
+    'Lesotho': '#9B59B6',
+    'Papua New Guinea': '#117A65',
+    'New Caledonia': '#5DADE2',
+    'Hawaiian Islands': '#F1C40F',
+    'Antananarivo, Madagascar': '#98df8a',
+    'Antsiranana, Madagascar': '#98df8a',
+    'Fianarantsoa, Madagascar': '#98df8a',
+    'Mahajanga, Madagascar': '#98df8a',
+    'Toamasina, Madagascar': '#98df8a',
+    'Toliary, Madagascar': '#98df8a',
+    'Malampa, Vanuatu': '#ff9896',
+    'Penama, Vanuatu': '#ff9896',
+    'Sanma, Vanuatu': '#ff9896',
+    'Shefa, Vanuatu': '#ff9896',
+    'Tafea, Vanuatu': '#ff9896',
+    'Torba, Vanuatu': '#ff9896'
+  };
+  const defaultColor = '#99A3A4';
+
   const overlayMaps = {}; 
   const allGeoJsonLayers = L.layerGroup().addTo(map); 
 
@@ -242,10 +273,20 @@
         return response.json();
       })
       .then(data => {
+        // *** MODIFICATION 2: Apply style directly on creation ***
+        const fillColorForLayer = colorMap[source.name] || defaultColor;
+
         const geoJsonLayer = L.geoJson(data, {
-          style: style,
+          style: {
+            fillColor: fillColorForLayer,
+            weight: 1.5,
+            opacity: 1,
+            color: 'white',
+            fillOpacity: 0.7
+          },
           onEachFeature: onEachFeature
         });
+        
         allGeoJsonLayers.addLayer(geoJsonLayer);
         overlayMaps[source.name] = geoJsonLayer;
       })
@@ -258,21 +299,16 @@
     console.log("All GeoJSON layers loaded and control added.");
   });
 
-  function style(feature) {
-    return {
-      fillColor: '#2f8a35',
-      weight: 1.5,
-      opacity: 1,
-      color: 'white',
-      fillOpacity: 0.7
-    };
-  }
+  // *** MODIFICATION 3: The old `style` function is no longer needed and can be deleted. ***
 
   function highlightFeature(e) {
     const layer = e.target;
+    // This is the original style object for the layer, which we can get directly.
+    const originalStyle = layer.options.style;
+
     layer.setStyle({
       weight: 3,
-      fillColor: '#72a2ad',
+      fillColor: '#72a2ad', // Highlight color
       color: '#7f8384',
       dashArray: '',
       fillOpacity: 0.9
@@ -282,6 +318,8 @@
 
   function resetHighlight(e) {
     const layer = e.target;
+    // resetStyle() correctly resets the feature to the style it was created with.
+    // Since each layer was created with its own unique color, this works perfectly.
     allGeoJsonLayers.eachLayer(geoJsonLayerGroup => {
       if (geoJsonLayerGroup.hasLayer(layer)) {
         geoJsonLayerGroup.resetStyle(layer);
@@ -290,7 +328,9 @@
   }
 
   function onEachFeature(feature, layer) {
-    const displayName = feature.properties.name || feature.properties.NAME || 'N/A';
+    // This part is for the tooltip only. It doesn't affect the color.
+    // We can still try to find a descriptive name from inside the file if possible.
+    const displayName = feature.properties.NAME_1 || feature.properties.NAME_0 || feature.properties.name || feature.properties.NAME || 'N/A';
     
     layer.bindTooltip(displayName, {
       permanent: false,
